@@ -38,6 +38,7 @@ public class OrderDetailController {
     }
     // Thêm mới 1 Order Detail
     @PostMapping("")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> createOrderDetail(@Valid @RequestBody OrderDetailDTO orderDetailDTO, BindingResult result){
         try{
             if(result.hasErrors()){
@@ -58,6 +59,7 @@ public class OrderDetailController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> updateOrderDetail(@PathVariable Long id, @Valid @RequestBody OrderDetailDTO orderDetailDTO){
 
         try {

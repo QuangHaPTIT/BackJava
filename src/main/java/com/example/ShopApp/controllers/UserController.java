@@ -15,6 +15,7 @@ import org.apache.coyote.Response;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -70,6 +71,7 @@ public class UserController {
         }
     }
     @PostMapping("/details")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getUserDetails(@RequestHeader("Authorization") String authorizationHeader){
         try{
             String token = authorizationHeader.substring(7); //Loại bỏ "Bearer "
@@ -81,6 +83,7 @@ public class UserController {
     }
 
     @PutMapping("/details/{userId}") // Use the appropriate URL mapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<UserResponse> updateUserDetails(
             @RequestHeader("Authorization") String authorizationHeader,
             @PathVariable Long userId,

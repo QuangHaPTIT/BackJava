@@ -105,6 +105,7 @@ public class ProductController {
     }
 
     @PostMapping("")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> createProduct(@Valid @RequestBody ProductDTO productDTO, BindingResult result){
 
         try{
@@ -123,6 +124,7 @@ public class ProductController {
     }
     // dùng để upload file ảnh
     @PostMapping(value = "/uploads/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> uploadImages(@ModelAttribute("files") List<MultipartFile> files, @PathVariable("id") Long id) throws IOException {
         try {
 
@@ -196,6 +198,7 @@ public class ProductController {
         return uniqueFilename;
     }
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody ProductDTO productDTO){
         try{
             ProductResponse productResponse = productSevice.updateProduct(id, productDTO);

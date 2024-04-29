@@ -25,19 +25,25 @@ spring:
     basename: i18n/messages
     encoding: UTF-8
     default-local: en
+  flyway:
+    locations: classpath:/db/migration,classpath:/dev/db/migration
+    #Phiên bản baseline sẽ = 1 và không thực hiện bất kì thay đổi nào trong db
+    baseline-on-migrate: true
+    baseline-version: 0
 api:
   prefix: api/v1
 
 jwt:
   expiration: 2592000 #30 day = 30 * 24 * 60 * 60
   secretKey: BPrN8FyHleRKz2bGiPi2vnJUwL13otRGmP/bdM9R2Mk=
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs
+  show-actuator: true
+
 management:
   endpoint:
     health:
       show-details: always
-  endpoints:
-    web:
-      base-path: /api/v1/actuator
-      exposure:
-        #include: "health"
-        include: "health, info"

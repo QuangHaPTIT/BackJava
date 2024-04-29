@@ -2,23 +2,29 @@ package com.example.ShopApp.components;
 
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.stereotype.Component;
 
-import java.net.InetAddress;
+
 @Component
 public class CustomHealthCheck implements HealthIndicator {
     @Override
     public Health health() {
-        // Implement your custom health check logic here
-        try {
-            String computerName = InetAddress.getLocalHost().getHostName();
-            return Health.up().withDetail("computerName", computerName).build();//code: 200
-            //return Health.up().withDetail("computerName", computerName).build();//code: 200
-        } catch (Exception e) {
-            //throw new RuntimeException(e);
+        long freeMemory = Runtime.getRuntime().freeMemory();
+        long totalMemory = Runtime.getRuntime().totalMemory();
+        double freeMemoryPercent = ((double) freeMemory / (double) totalMemory) * 100;
+        if (freeMemoryPercent > 25) {
+            return Health.up()
+                    .withDetail("free_memory", freeMemory + " bytes")
+                    .withDetail("total_memory", totalMemory + " bytes")
+                    .withDetail("free_memory_percent", freeMemoryPercent + "%")
+                    .build();
+        } else {
             return Health.down()
-                    .withDetail("Error", e.getMessage()).build();
+                    .withDetail("free_memory", freeMemory + " bytes")
+                    .withDetail("total_memory", totalMemory + " bytes")
+                    .withDetail("free_memory_percent", freeMemoryPercent + "%")
+                    .build();
         }
     }
 }

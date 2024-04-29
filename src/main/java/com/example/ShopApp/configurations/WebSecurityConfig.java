@@ -52,7 +52,18 @@ public class WebSecurityConfig {
                             .requestMatchers(
                                     String.format("%s/users/register", apiPrefix),
                                     String.format("%s/users/login", apiPrefix),
-                                    String.format("%s/actuator/**", apiPrefix)
+                                    String.format("actuator/**"),
+                                    // swagger
+                                    "/api-docs",
+                                    "/api-docs/**",
+                                    "/swagger-resources",
+                                    "/swagger-resources/**",
+                                    "/configuration/ui",
+                                    "/configuration/security",
+                                    "/swagger-ui/**",
+                                    "/swagger-ui.html",
+                                    "/webjars/swagger-ui/**",
+                                    "/swagger-ui/index.html"
                             )
                             .permitAll()
                             .requestMatchers(GET,
@@ -61,38 +72,18 @@ public class WebSecurityConfig {
                                     String.format("%s/categories**", apiPrefix)).permitAll()
                             .requestMatchers(GET,
                                     String.format("%s/categories/**", apiPrefix)).permitAll()
-                            .requestMatchers(POST,
-                                    String.format("%s/categories/**", apiPrefix)).hasAnyRole(Role.ADMIN)
-                            .requestMatchers(PUT,
-                                    String.format("%s/categories/**", apiPrefix)).hasAnyRole(Role.ADMIN)
-                            .requestMatchers(DELETE,
-                                    String.format("%s/categories/**", apiPrefix)).hasAnyRole(Role.ADMIN)
                             .requestMatchers(GET,
                                     String.format("%s/products**", apiPrefix)).permitAll()
                             .requestMatchers(GET,
                                     String.format("%s/products/**", apiPrefix)).permitAll()
                             .requestMatchers(GET,
                                     String.format("%s/products/images/*", apiPrefix)).permitAll()
-                            .requestMatchers(POST,
-                                    String.format("%s/products**", apiPrefix)).hasAnyRole(Role.ADMIN)
-                            .requestMatchers(PUT,
-                                    String.format("%s/products/**", apiPrefix)).hasAnyRole(Role.ADMIN)
-//                            .requestMatchers(DELETE,
-//                                    String.format("%s/products/**", apiPrefix)).hasAnyRole(Role.ADMIN)
-                            .requestMatchers(POST,
-                                    String.format("%s/orders/**", apiPrefix)).hasAnyRole(Role.USER, Role.ADMIN)
                             .requestMatchers(GET,
                                     String.format("%s/orders/**", apiPrefix)).permitAll()
-//                            .requestMatchers(PUT,
-//                                    String.format("%s/orders/**", apiPrefix)).hasRole(Role.ADMIN)
-                            .requestMatchers(POST,
-                                    String.format("%s/order_details/**", apiPrefix)).hasAnyRole(Role.USER)
                             .requestMatchers(GET,
                                     String.format("%s/order_details/**", apiPrefix)).permitAll()
                             .requestMatchers(PUT,
                                     String.format("%s/order_details/**", apiPrefix)).hasRole(Role.ADMIN)
-//                            .requestMatchers(DELETE,
-//                                    String.format("%s/order_details/**", apiPrefix)).hasRole(Role.ADMIN)
                             .requestMatchers(PUT,
                                     String.format("%s/users/details/**", apiPrefix)).hasRole(Role.USER)
                             .anyRequest().authenticated();

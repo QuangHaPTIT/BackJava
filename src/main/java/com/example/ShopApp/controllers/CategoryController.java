@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,7 @@ public class CategoryController {
     private final LocaleResolver localeResolver;
     private final LocalizationUtils localizationUtils;
     @PostMapping("")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> createCategory(@Valid @RequestBody CategoryDTO categoryDTO, BindingResult result){
         if(result.hasErrors()){
             List<String> errors = result.getFieldErrors()
@@ -55,6 +57,7 @@ public class CategoryController {
 
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryDTO categoryDTO){
         CategoryResponse categoryResponse = categorySeviceimpl.updateCategory(id, categoryDTO);
         BaseResponse baseResponse = BaseResponse.builder()
@@ -65,6 +68,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteCategory(@PathVariable Long id){
         categorySeviceimpl.deleteCategory(id);
         BaseResponse baseResponse = BaseResponse.builder()
