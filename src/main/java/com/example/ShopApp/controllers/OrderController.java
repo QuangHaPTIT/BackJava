@@ -21,6 +21,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("${api.prefix}/orders")
@@ -38,7 +39,7 @@ public class OrderController {
                 List<String> errorMessages = result.getFieldErrors()
                         .stream()
                         .map(FieldError::getDefaultMessage)
-                        .toList();
+                        .collect(Collectors.toList());
                 return ResponseEntity.badRequest().body(errorMessages);
             }
             OrderResponse orderResponse = orderService.createOrder(orderDTO);
@@ -49,7 +50,7 @@ public class OrderController {
     }
 
     @GetMapping("/user/{user_id}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN, ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> getOrders(@Valid @PathVariable("user_id") Long userId){
         try{
             List<OrderResponse> orderResponses = orderService.getOrderByUserId(userId);
@@ -76,7 +77,7 @@ public class OrderController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<String> deleteOrder(@Valid @PathVariable Long id){
         // Xóa mềm => cập nhật trường active = false
         orderService.deleteOrder(id);

@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("${api.prefix}/categories")
@@ -24,8 +26,6 @@ import java.util.List;
 //@Validated
 public class CategoryController {
     private final CategorySeviceImpl categorySeviceimpl;
-    private final MessageSource messageSource;
-    private final LocaleResolver localeResolver;
     private final LocalizationUtils localizationUtils;
     @PostMapping("")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -34,7 +34,7 @@ public class CategoryController {
             List<String> errors = result.getFieldErrors()
                     .stream()
                     .map(FieldError::getDefaultMessage)
-                    .toList();
+                    .collect(Collectors.toList());
             return ResponseEntity.badRequest().body(errors);
         }
         categorySeviceimpl.createCategory(categoryDTO);

@@ -15,6 +15,7 @@ import com.example.ShopApp.response.UserResponse;
 import com.example.ShopApp.sevices.impl.UserSeviceImpl;
 import com.example.ShopApp.utils.MessageKeys;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
@@ -29,6 +30,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+
 public class UserSevice implements UserSeviceImpl {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -103,14 +105,14 @@ public class UserSevice implements UserSeviceImpl {
     }
 
     @Override
-    public UserResponse getUserDetailsFromToken(String token) throws Exception {
+    public User getUserDetailsFromToken(String token) throws Exception {
         if(jwtTokenUtil.isTokenExpired(token)) {
             throw new Exception("Token is expired");
         }
         String phoneNumber = jwtTokenUtil.extractPhoneNumber(token);
         Optional<User> user = userRepository.findByPhoneNumber(phoneNumber);
         if(user.isPresent()) {
-            return UserResponse.fromUser(user.get());
+            return user.get();
         }else{
             throw new Exception("User not found");
         }

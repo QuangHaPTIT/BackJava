@@ -13,6 +13,7 @@ import com.example.ShopApp.repositories.ProductRepository;
 import com.example.ShopApp.response.ProductResponse;
 import com.example.ShopApp.sevices.impl.ProductSeviceImpl;
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -27,6 +28,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+
 public class ProductService implements ProductSeviceImpl {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;

@@ -35,6 +35,7 @@ api:
 
 jwt:
   expiration: 2592000 #30 day = 30 * 24 * 60 * 60
+  expiration-refresh-token: 5184000 #60 day
   secretKey: BPrN8FyHleRKz2bGiPi2vnJUwL13otRGmP/bdM9R2Mk=
 springdoc:
   swagger-ui:

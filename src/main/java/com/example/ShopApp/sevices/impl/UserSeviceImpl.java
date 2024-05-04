@@ -10,7 +10,7 @@ public interface UserSeviceImpl {
 
     String login(String phoneNumber, String password, Long roleId) throws DataNotFoundException, Exception;
 
-    UserResponse getUserDetailsFromToken(String token) throws Exception;
+    User getUserDetailsFromToken(String token) throws Exception;
 
     UserResponse updateUser(Long userId, UserDTO userDTO) throws DataNotFoundException;
 }

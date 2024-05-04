@@ -113,7 +113,7 @@ public class ProductController {
                 List<String> errors = result.getFieldErrors()
                         .stream()
                         .map(FieldError::getDefaultMessage)
-                        .toList();
+                        .collect(Collectors.toList());
                 return ResponseEntity.badRequest().body(errors);
             }
             ProductResponse productResponse = productSevice.createProduct(productDTO);

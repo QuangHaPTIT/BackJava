@@ -14,6 +14,7 @@ import com.example.ShopApp.response.OrderDetailResponse;
 import com.example.ShopApp.response.OrderResponse;
 import com.example.ShopApp.sevices.impl.OrderDetailServiceImpl;
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
@@ -23,9 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+
 public class OrderDetailService implements OrderDetailServiceImpl {
     private final OrderDetailRepository orderDetailRepository;
     private final ModelMapper modelMapper;
@@ -61,7 +64,7 @@ public class OrderDetailService implements OrderDetailServiceImpl {
     @Override
     public List<OrderDetailResponse> getOrderDetailByOrderId(Long orderId) {
         List<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(orderId);
-        List<OrderDetailResponse> orderDetailResponses = orderDetails.stream().map(OrderDetailResponse::fromOrderDetail).toList();
+        List<OrderDetailResponse> orderDetailResponses = orderDetails.stream().map(OrderDetailResponse::fromOrderDetail).collect(Collectors.toList());;
         return orderDetailResponses;
     }
     @Transactional

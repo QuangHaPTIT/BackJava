@@ -4,6 +4,7 @@ import com.example.ShopApp.entity.Role;
 import com.example.ShopApp.repositories.RoleRepository;
 import com.example.ShopApp.response.RoleResponse;
 import com.example.ShopApp.sevices.impl.RoleServiceImpl;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+
 public class RoleService implements RoleServiceImpl {
     private final RoleRepository roleRepository;
     @Override

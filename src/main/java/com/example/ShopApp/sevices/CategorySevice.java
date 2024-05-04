@@ -6,6 +6,7 @@ import com.example.ShopApp.exceptions.DataNotFoundException;
 import com.example.ShopApp.repositories.CategoryRepository;
 import com.example.ShopApp.response.CategoryResponse;
 import com.example.ShopApp.sevices.impl.CategorySeviceImpl;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+
 public class CategorySevice implements CategorySeviceImpl{
     private final CategoryRepository categoryRepository;
 

@@ -29,6 +29,10 @@ public class JwtTokenUtil {
 
     @Value("${jwt.secretkey}")
     private String secretKey;
+
+    @Value("${jwt.expiration-refresh-token}")
+    private int expirationRefreshToken;
+
     // Vì user trong entity đã implement từ thằng userdetail trong spring security rồi nên tham số là user
     public String generateToken(User user) throws Exception {
         Map<String, Object> claims = new HashMap<>();
@@ -41,6 +45,25 @@ public class JwtTokenUtil {
                     .setClaims(claims)
                     .setSubject(user.getPhoneNumber())
                     .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000L))
+                    .signWith(getSignInkey(), SignatureAlgorithm.HS256)
+                    .compact();
+            return token;
+        }catch (Exception e){
+            // Có thể dùng logger
+            throw new InvalidParamException("Cannot create jwt token, error: " +  e.getMessage());
+        }
+    }
+    public String generateRefreshToken(User user) throws Exception {
+        Map<String, Object> claims = new HashMap<>();
+        //this.generateSecretKey();
+        claims.put("phoneNumber", user.getPhoneNumber());
+        claims.put("userId", user.getId());
+        try{
+            // Tạo chuỗi JSON Web token từ phonNumber là username
+            String token = Jwts.builder()
+                    .setClaims(claims)
+                    .setSubject(user.getPhoneNumber())
+                    .setExpiration(new Date(System.currentTimeMillis() + expirationRefreshToken * 1000L))
                     .signWith(getSignInkey(), SignatureAlgorithm.HS256)
                     .compact();
             return token;

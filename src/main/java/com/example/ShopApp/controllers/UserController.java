@@ -1,14 +1,18 @@
 package com.example.ShopApp.controllers;
 
+import com.example.ShopApp.dtos.RefreshTokenDTO;
 import com.example.ShopApp.dtos.UserDTO;
 import com.example.ShopApp.dtos.UserLoginDTO;
 import com.example.ShopApp.entity.Role;
 import com.example.ShopApp.entity.User;
 import com.example.ShopApp.response.LoginResponse;
+import com.example.ShopApp.response.TokenResponse;
 import com.example.ShopApp.response.UserResponse;
+import com.example.ShopApp.sevices.impl.TokenServiceImpl;
 import com.example.ShopApp.sevices.impl.UserSeviceImpl;
 import com.example.ShopApp.components.LocalizationUtils;
 import com.example.ShopApp.utils.MessageKeys;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
@@ -23,6 +27,7 @@ import org.springframework.web.servlet.LocaleResolver;
 
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @CrossOrigin("*")
 @RestController
@@ -33,6 +38,7 @@ public class UserController {
     private final MessageSource messageSource;
     private final LocaleResolver localeResolver;
     private final LocalizationUtils localizationUtils;
+    private final TokenServiceImpl tokenService;
     @PostMapping("/register")
     public ResponseEntity<?> createUser(@Valid @RequestBody UserDTO userDTO, BindingResult result){
         try{
@@ -40,7 +46,7 @@ public class UserController {
                 List<String> errorMessage = result.getFieldErrors()
                         .stream()
                         .map(FieldError::getDefaultMessage)
-                        .toList();
+                        .collect(Collectors.toList());
                 return ResponseEntity.badRequest().body(errorMessage);
             }
 
@@ -54,13 +60,24 @@ public class UserController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    private boolean isMobileDevice(String userAgent) {
+        // Kiểm tra User-Agent header để xác định thiết bị di động
+        // Ví dụ đơn giản:
+        return userAgent.toLowerCase().contains("mobile");
+    }
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@Valid @RequestBody UserLoginDTO userLoginDTO){
+    public ResponseEntity<?> loginUser(@Valid @RequestBody UserLoginDTO userLoginDTO, HttpServletRequest request){
         try {
+            String userAgent = request.getHeader("User-Agent");
             String token = userSevice.login(userLoginDTO.getPhoneNumber(), userLoginDTO.getPassword(), userLoginDTO.getRoleId()==null? 1 : userLoginDTO.getRoleId());
+            User user = userSevice.getUserDetailsFromToken(token);
+            TokenResponse tokenResponse = tokenService.addToken(user.getId(), token, isMobileDevice(userAgent));
             return ResponseEntity.ok(LoginResponse.builder()
                     .message(localizationUtils.getLocalizedMessage("user.login.login_successfully"))
                     .token(token)
+                    .refreshToken(tokenResponse.getRefreshToken())
+                    .roles(user.getAuthorities().stream().map(item -> item.getAuthority()).collect(Collectors.toList()))
+                    .id(user.getId())
                     .build());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(LoginResponse.builder()
@@ -75,8 +92,8 @@ public class UserController {
     public ResponseEntity<?> getUserDetails(@RequestHeader("Authorization") String authorizationHeader){
         try{
             String token = authorizationHeader.substring(7); //Loại bỏ "Bearer "
-            UserResponse userResponse = userSevice.getUserDetailsFromToken(token);
-            return ResponseEntity.ok(userResponse);
+            User user = userSevice.getUserDetailsFromToken(token);
+            return ResponseEntity.ok(UserResponse.fromUser(user));
         }catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -91,7 +108,7 @@ public class UserController {
     {
         try{
             String token = authorizationHeader.substring(7);
-            UserResponse user = userSevice.getUserDetailsFromToken(token);
+            User user = userSevice.getUserDetailsFromToken(token);
             if(user.getId() != userId){
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
@@ -100,5 +117,18 @@ public class UserController {
         }catch (Exception e){
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @PostMapping("/refreshToken")
+    public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenDTO refreshTokenDTO) throws Exception {
+        User user = userSevice.getUserDetailsFromToken(refreshTokenDTO.getRefreshToken());
+        TokenResponse tokenResponse = tokenService.refreshToken(refreshTokenDTO.getRefreshToken(), user);
+        LoginResponse loginResponse = LoginResponse.builder()
+                .id(user.getId())
+                .token(tokenResponse.getToken())
+                .refreshToken(tokenResponse.getRefreshToken())
+                .roles(user.getAuthorities().stream().map(item -> item.getAuthority()).collect(Collectors.toList()))
+                .build();
+        return ResponseEntity.ok(loginResponse);
     }
 }
